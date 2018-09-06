@@ -13,14 +13,12 @@ const getSavedTodos = function () {
 const saveTodos = function (todos){
     localStorage.setItem('todos', JSON.stringify(todos))
 }
-
 // Render todos
-
 const renderedTodos = function (todos, filters){
     let filteredTodos = todos.filter(function (todo){
         return todo.text.toLowerCase().includes(filters.searchText.toLowerCase())
     })
-    debugger
+    
     filteredTodos = filteredTodos.filter(function (todo){
         if (filters.hideCompleted){
             return !todo.completed
@@ -28,15 +26,12 @@ const renderedTodos = function (todos, filters){
             return true
         }
     })
-    
 
     const incomplete = filteredTodos.filter(function (todo){
         return !todo.completed
     })
 
     document.querySelector('#todos').innerHTML = ''
-    
-    
     document.querySelector('#todos').appendChild(getSummaryDOM(incomplete))
     
     filteredTodos.forEach(function (todo){
@@ -44,14 +39,41 @@ const renderedTodos = function (todos, filters){
     })
     
 }
+// setup remove function 
+const removeTodo = function (id){
+    const todoIndex = todos.findIndex(function (todo){
+        return todo.id === id
+    })
+    if (todoIndex > -1){
+        todos.splice(todoIndex, 1)
+    }
+
+}
 
 // Generate the DOM structure for a todo
 const generateTodoDOM = function (todo){
-    const p = document.createElement('p')
-        p.textContent = todo.text
-       return p
-}
+    const todoEl = document.createElement('div')
+    const todoText = document.createElement('span')
+    const checkbox = document.createElement('input')
+    const removeButton = document.createElement('button')
+//setup todo checkbox
+    checkbox.setAttribute('type', 'checkbox')
+    todoEl.appendChild(checkbox)
 
+// setup the span text
+    todoText.textContent = todo.text
+    todoEl.appendChild(todoText)
+// setup the button
+    removeButton.textContent = 'x'  
+    todoEl.appendChild(removeButton) 
+    removeButton.addEventListener('click', function (e){
+        removeTodo(todo.id)
+        saveTodos(todos)
+        renderedTodos(todos, filters)
+    })
+
+       return todoEl
+}
 // Get the DOM elements for list summary
 const getSummaryDOM = function (incomplete){
     const summary = document.createElement('h2')
